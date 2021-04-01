@@ -4,7 +4,7 @@
 
 | | [cardano-cli](https://github.com/input-output-hk/cardano-node/releases/latest) | [cardano-node](https://github.com/input-output-hk/cardano-node/releases/latest) | [cardano-hw-cli](https://github.com/vacuumlabs/cardano-hw-cli/releases/latest) | Ledger Cardano-App | Trezor Firmware |
 | :---  |   :---:     |    :---:     |     :---:      |     :---:      |     :---:      |
-| *Required<br>version<br><sub>or higher</sub>* | <b>1.25.1</b><br><sub>**git checkout tags/1.25.1**</sub> | <b>1.25.1</b><br><sub>**git checkout tags/1.25.1**</sub> | <b>1.1.3</b><br><sub>**if you use hw-wallets** | <b>2.2.0</b><br><sub>**if you use hw-wallets** | <b>2.3.6</b><br><sub>**if you use hw-wallets** |
+| *Required<br>version<br><sub>or higher</sub>* | <b>1.26.0</b><br><sub>**git checkout tags/1.26.0**</sub> | <b>1.26.0</b><br><sub>**git checkout tags/1.26.0**</sub> | <b>1.2.0</b><br><sub>**if you use hw-wallets** | <b>2.2.0</b><br><sub>**if you use hw-wallets** | <b>2.3.6</b><br><sub>**if you use hw-wallets** |
 
 > *:bulb: PLEASE USE THE **CONFIG AND GENESIS FILES** FROM [**here**](https://hydra.iohk.io/job/Cardano/cardano-node/cardano-deployment/latest-finished/download/1/index.html), choose testnet, launchpad or staging*. 
 
@@ -14,7 +14,7 @@
 <img src="https://www.stakepool.at/pics/stakepool_operator_scripts.png" align="right" border=0>
 
 Theses scripts here should help you to manage your StakePool via the CLI. As always use them at your own risk, but they should be errorfree. Scripts were made to make things easier while learning all the commands and steps to bring up the stakepool node. So, don't be mad at me if something is not working. CLI calls are different almost daily currently.<br>&nbsp;<br>
-Some scripts are using **jq, curl & bc** so make sure you have it installed with a command like<br>```$ sudo apt update && sudo apt install -y jq curl bc```
+Some scripts are using **jq, curl, bc & xxd** so make sure you have it installed with a command like<br>```$ sudo apt update && sudo apt install -y jq curl bc xxd```
 
 &nbsp;<br>
 **Contacts**: Telegram - [@atada_stakepool](https://t.me/atada_stakepool), Twitter - [@ATADA_Stakepool](https://twitter.com/ATADA_Stakepool), Homepage - https://stakepool.at 
@@ -136,7 +136,7 @@ cp cardano/testnet/* bin/
 <details>
    <summary><b>How to verify the SHA256 checksum for Mainnet-Scripts ... </b>:bookmark_tabs:<br></summary>
    
-<br>In addition to the `sha256sum_sposcripts.txt` file that is stored in the GitHub Repository, you can do an additional check with a file that is hosted on a different secury webserver:
+<br>In addition to the `sha256sum_sposcripts.txt` file that is stored in the GitHub Repository, you can do an additional check with a file that is hosted on a different secure webserver:
 
 **Change into the Directory of the Mainnet-Scripts(bin) and Verify the SHA256 checksum**
 ```console
@@ -268,7 +268,10 @@ Checkout the configuration parameters in your 00_common.sh Main-Configuration fi
 <br>```./01_sendAssets.sh <fromAddr> <toAddress|HASH> <PolicyID.Name|<PATHtoNAME>.asset> <AmountOfAssets|ALL> [Opt: Amount of lovelaces to attach] [Opt: selected UTXOs]```**&sup1;**
 <br>```./01_sendAssets.sh addr1 addr2 mypolicy.SUPERTOKEN 15```<br>to send 15 SUPERTOKEN from addr1.addr to addr2.addr with minimum lovelaces attached
 <br>```./01_sendAssets.sh addr1 addr2 mypolicy.MEGATOKEN ALL 12000000```<br>to send **ALL** MEGATOKEN from addr1.addr to addr2.addr and also 12 ADA
-<br>```./01_sendAssets.sh addr1 addr2 34250edd1e9836f5378702fbf9416b709bc140e04f668cc355208518.ATADAcoin 120```<br>to send 120 Tokens of Type 34250edd1e9836f5378702fbf9416b709bc140e04f668cc355208518.ATADAcoin from addr1.addr to addr2.addr. Using the PolicyID.TokenNameHASH allowes you to send out Tokens you've got from others. You own generated Tokens can be referenced by the AssetFile 'policyName.tokenName.asset' schema for a easier handling.
+<br>```./01_sendAssets.sh addr1 addr2 34250edd1e9836f5378702fbf9416b709bc140e04f668cc355208518.ATADAcoin 120```<br>to send 120 Tokens of Type 34250edd1e9836f5378702fbf9416b709bc140e04f668cc355208518.ATADAcoin from addr1.addr to addr2.addr. 
+<br>```./01_sendAssets.sh addr1 addr2 asset1ee0u29k4xwauf0r7w8g30klgraxw0y4rz2t7xs 1000```<br>to send 1000 Assets with that Bech-AssetName asset1ee0u29k4xwauf0r7w8g30klgraxw0y4rz2t7xs :smiley:
+
+  Using the **PolicyID.TokenNameHASH** or **Bech-AssetName** allowes you to send out Tokens you've got from others. Your own generated Tokens can also be referenced by the AssetFile 'policyName.tokenName.asset' schema for an easier handling.
 
   :bulb: **&sup1; Expert-Option**: It is possible to specify the exact UTXOs the script should use for the transfer, you can provide these as an additional parameter within quotes like ```"5cf85f03990804631a851f0b0770e613f9f86af303bfdb106374c6093924916b#0"``` to specify one UTXO and like ```"5cf85f03990804631a851f0b0770e613f9f86af303bfdb106374c6093924916b#0|6ab045e549ec9cb65e70f544dfe153f67aed451094e8e5c32f179a4899d7783c#1"``` to specify two UTXOs separated via a `|` char.
 
@@ -477,7 +480,26 @@ Also you can force the script to do a re-registration by adding the keyword RERE
   
   ```./11b_burnAsset.sh assets/mypolicy2.HYPERTOKEN 5 owner.payment```<br>this will burn 5 HYPERTOKEN with policy 'mypolicy2' from the subdirectory assets on the payment address owner.payment.addr, also it will send along the mymetadata.json in the Burning-Transaction
 
-It generally depends on the Policy-Type (made by the script 10a) if you can burn unlimited Tokens or if you are Time-Limited so a fixed Value of Tokens exists and there will never be less.
+  It generally depends on the Policy-Type (made by the script 10) if you can burn unlimited Tokens or if you are Time-Limited so a fixed Value of Tokens exists and there will never be less.
+
+&nbsp;<br>
+* **12a_genAssetMeta.sh:** is used to generate and sign the special JSON format which is used to register your Token Metadata on the Token-Registry-Server. This script needs the tool **cardano-metadata-submitter** from IOHK (https://github.com/input-output-hk/cardano-metadata-submitter). I uploaded a version of it into the scripts directory so you have a faster start.
+  <br>```./12a_genAssetMeta.sh <PolicyName.AssetName>```
+  
+  ```./12a_genAssetMeta.sh mypolicy.SUPERTOKEN```<br>this will generate the MetadataRegistration-JSON for the SUPERTOKEN and policy 'mypolicy'
+  
+  It will use the information stored in the <PolicyName.AssetName>.asset file to generate the Registration Data. You can edit this file before you run this command to your needs. Please only edit the entries starting with "meta". If the AssetFile is an older type, just run 12a once with that file and it will automatically add all the needed and available Entry-Fields for you! Please check the examples to learn more about the needed informations. :smiley:
+
+&nbsp;<br>
+* **12b_checkAssetMetaServer.sh:** will check the currently stored information about the given Asset from the TokenRegistryServer (only in Onine-Mode)
+  <br>```./12b_checkAssetMetaServer.sh <PolicyName.AssetName OR assetSubject(Hex-Code)>```
+  
+  ```./12b_checkAssetMetaServer.sh mypolicy.SUPERTOKEN```<br>this will check the Registered Metadata for the the SUPERTOKEN (policy mypolicy)
+  
+  You can run a query by that command against the Cardano Token Registry Server (https://github.com/cardano-foundation/cardano-token-registry). Wallets like Daedalus will use this information to show MetaContent about the NativeAsset(Token). Please check the examples to learn more about the needed informations.
+
+&nbsp;<br>
+&nbsp;<br>
 
 </details>
 
@@ -598,6 +620,72 @@ The **poolname.pool.json** file is your Config-Json to manage your individual Po
   "deregSubmitted": "Di Jun  2 17:14:38 CEST 2020"
 }
 ```
+&nbsp;<br>
+&nbsp;<br>
+
+</details>
+
+
+### NativeAsset-Information-File (policyName.assetName.asset) - for your own NativeAssets
+
+The **policyName.assetName.asset** file is your Config- and Information Json for your own NativeAssets you minted. In addition to the basic information this also holds your Metadata you wanna provide to the TokenRegistry Server.<br>**This file will be automatically created by the scripts 11a, 11b or 12a** ...<br>
+   
+<details>
+   <summary><b>Checkout how the AssetFile-Json looks like and the parameters ... </b>:bookmark_tabs:<br></summary>
+
+<br>**Sample wakandaPolicy.mySuperToken.asset**
+  ```console
+  {
+  "metaName": "SUPER Token",
+  "metaDescription": "This is the description of the Wakanda SUPERTOKEN",
+  "---": "--- Optional additional info ---",
+  "metaTicker": "SUPER",
+  "metaUrl": "https://wakandaforever.io",
+  "metaLogoPNG": "supertoken.png",
+  "===": "--- DO NOT EDIT BELOW THIS LINE !!! ---",
+  "minted": "10000",
+  "name": "mySuperToken",
+  "bechName": "asset1qv84q4cxq5lglvpt22lwjnp2flfe6r8zk72zpd",
+  "policyID": "aeaab6fa86997512b4f850049148610d662b5a7a971d6e132a094062",
+  "policyValidBeforeSlot": "unlimited",
+  "subject": "aeaab6fa86997512b4f850049148610d662b5a7a971d6e132a0940626d795375706572546f6b656e",
+  "lastUpdate": "Mon, 15 Mar 2021 17:46:46 +0100",
+  "lastAction": "created Asset-File"
+  }
+  ```
+### User editable Parameters
+
+| Parameter | State | Description | Example |
+| :---      | :---: |    :---     | :---    |
+| metaName | **required** | Name of your NativeAsset (1-50chars) | SUPER Token |
+| metaDescription | optional | Description of your NativeAsset (max. 500chars) | This is the SUPER Token, once upon... |
+| metaTicker | optional | ShortTicker Name (3-5chars) | MAX, SUPER, Yeah |
+| metaUrl | optional | Secure Weblink, must start with https:// (max. 250chars) | https://wakandaforever.io |
+| metaLogoPNG | optional | Path to a valid PNG Image File for your NativeAsset (max. 64kB) | supertoken.png |
+
+> *:warning: Don't edit the file below the **--- DO NOT EDIT BELOW THIS LINE !!! ---** line. The scripts will store information about your minting and burning process in there together with additional information like lastAction.*
+
+<!-- | metaSubUnitDecimals | optional | You can provide the amount of decimals here (0-19 decimals)<br>If you set it to more than 0, you also have to provide the Name for it. 0 means no decimals, just full amount of Tokens. | 250 Tokens:<br>**0** -> 250 SUPER<br>**2** -> 2,50 SUPER<br>**6** -> 0,000250 SUPER |
+| metaSubUnitName | optional | Needed parameter if you set the above parameter to 1-19. With Cardano as an example you would have "ADA" as the metaName, "lovelaces" as the metaSubUnitName and the metaSubUnitDecimals would be 6 | lovelaces, cents | -->
+
+### Only informational Parameters - Do not edit them !!!
+
+| Parameter | Description | Example |
+| :---      |    :---     | :---    |
+| minted | Amount of Assets you have minted in total. This accumulates, if you burn some this number will decrease. | 10000 |
+| name | This is the ASCII FileName you have used to create the Token. It also represents the ASCII readable AssetName | mySuperToken |
+| bechName | This is the bech32 representation of your NatikeAsset/Token. It starts with 'asset' and is also called fingerprint. | asset1qv...2zpd |
+| policyID | Thats the unique policyID in hex format, generated from your policyScript and your Keys. | aeaab6fa8699....751294062 |
+| policyValidBeforeSlot | This will show your policy-Status. You can generate unlimited policies and SlotTime limited policies with the script 10. | unlimited |
+| subject | This it the unique hex representation of your unique policyID combined with the hex encoded ASCII-Name. Thats your reference in the Token Registry that will be used by the wallet to query your Metadata! | aeaab6fa8699....6f6b656e |
+| lastUpdate | This shows the date when the assetFile was updated the last time by generation Metadata or Minting/Burning Tokens | *Date* |
+| lastAction | Short descrition of the process that happend at the date show in the entry lastUpdate | *Action* |
+
+> *:warning: Don't edit the file below the **--- DO NOT EDIT BELOW THIS LINE !!! ---** line. The scripts will store information about your minting and burning process in there together with additional information like lastAction.*
+
+&nbsp;<br>
+&nbsp;<br>
+
 
 </details>
 
@@ -1469,9 +1557,80 @@ Done. :smiley:
 
 There are more options available to select the amount of the Tokens. You can find all the syntax for this 01_sendAssets.sh script [here](#main-configuration-file-00_commonsh---syntax-for-all-the-other-ones)
 
-&nbsp;<br>
+&nbsp;<br>&nbsp;<br>
+
 </details>
 
+## How to register Metadata for your Native Tokens
+
+Here you can find the steps to add Metadata (Name, Decimals, an Url, a Picture ...) of your Native Tokens to the TokenRegistryServer.
+
+<details>
+   <Summary><b>Show Example ... </b>:bookmark_tabs:<br></summary>
+
+### Generate the special formatted and signed JSON File for the GitHub PullRequest
+
+How does it work: The **Mainnet** TokenRegistryServer (currently maintained by the CardanoFoundation) is fed via a special GitHub Repository https://github.com/cardano-foundation/cardano-token-registry .
+> The TokenRegistryServer for the Public-Testnet is: https://github.com/input-output-hk/metadata-registry-testnet
+
+The script 12a provides you with a method that is using the **cardano-metadata-submitter** binary from IOHK to form and sign the needed JSON file for the registration of your Metadata on this GitHub Repo. You can find the binary here (https://github.com/input-output-hk/cardano-metadata-submitter) or you can simply use the one that is provided within these scripts. After you have created that special JSON file, you can then browse to GitHub and clone the cardano-token-registry Repo into your own repo. After that, upload the special JSON file into the 'mappings' folder and generate a PullRequest to merge it back with the Master-Branch of the CardanoFoundation Repo.
+
+So lets say we wanna create the Metadata registration JSON for our **SUPERTOKEN** under the policy **mypolicy** we minted before using the 'assets' directory.
+
+<br><b>Steps:</b>
+1. Make sure that the path-setting in the `00_common.sh` config file is correct for the `cardanometa="./cardano-metadata-submitter"` entry. The script will automatically try to find it also in the scripts directory.
+
+1. Run ```./12a_genAssetMeta.sh assets/mypolicy.SUPERTOKEN``` to make sure that the AssetFile is automatically filled with all the needed entries.
+
+1. Open the AssetFile `assets/mypolicy.SUPERTOKEN.asset` in an editor and modify the upper part so it fits your needs, here is an example:
+   ```console
+   {
+   "metaName": "SUPER Token",
+   "metaDescription": "This is the description of the Wakanda SUPERTOKEN",
+   "---": "--- Optional additional info ---",
+   "metaTicker": "SUPER",
+   "metaUrl": "https://wakandaforever.io",
+   "metaLogoPNG": "supertoken.png",
+   "===": "--- DO NOT EDIT BELOW THIS LINE !!! ---",
+   "minted": "10000",
+   "name": "SUPERTOKEN",
+   "bechName": "asset1qv84q4cxq5lglvpt22lwjnp2flfe6r8zk72zpd",
+   "policyID": "aeaab6fa86997512b4f850049148610d662b5a7a971d6e132a094062",
+   "policyValidBeforeSlot": "unlimited",
+   "subject": "aeaab6fa86997512b4f850049148610d662b5a7a971d6e132a0940626d795375706572546f6b656e",
+   "lastUpdate": "Mon, 15 Mar 2021 17:46:46 +0100",
+   "lastAction": "created Asset-File"
+   }
+   ```
+   > **You can find more details about the parameters [here](#nativeasset-information-file-policynameassetnameasset---for-your-own-nativeassets)**<br>*:warning: Don't edit the file below the **--- DO NOT EDIT BELOW THIS LINE !!! ---** line.*
+
+1. Save the AssetFile.
+
+1. Run ```./12a_genAssetMeta.sh assets/mypolicy.SUPERTOKEN``` again to produce the special JSON file for the Registration
+
+1. The special file was created, in this example it would be a file with the name<br>**aeaab6fa86997512b4f850049148610d662b5a7a971d6e132a0940626d795375706572546f6b656e.json**<br>:warning: Do not rename the file!
+
+1. Go to https://github.com/cardano-foundation/cardano-token-registry and clone the Repo into your own Repo
+   > The TokenRegistryServer for the Public-Testnet is: https://github.com/input-output-hk/metadata-registry-testnet
+
+1. Upload the special file now in your own Repo into the **mappings directory**. Or you can replace an old file if you already did this step before to update your metadata.
+
+1. Create a pull-request to merge it back with the Master-Branch of the CardanoFoundation/cardano-token-registry Repo
+
+Done - You have uploaded your Metadata for your own NativeAsset/Token. Now you have to wait a bit until it is approved by the CardanoFoundation.
+
+### Check the registered Metadata on the TokenRegistry Server
+
+It is possible to check the currently stored data on the TokenRegistry Server, the script 12b can query that for you. Lets say if we wanna check back if the recently uploaded (pull-request) Metadata is already stored in the Server.
+
+<br><b>Steps:</b>
+1. Run ```./12b_checkAssetMetaServer.sh assets/mypolicy.SUPERTOKEN``` to check the latest data on the TokenRegistryServer
+
+You will get a feedback on the data that is stored on the server, this check is only available in Online-Mode. The script will automatically choose the Mainnet or the Testnet Server depending on your magicparameter set in the config file.
+
+&nbsp;<br>&nbsp;<br>
+
+</details>
 
 
 ## Using multiple relays in your poolname.pool.json
@@ -2269,6 +2428,12 @@ There are more options available to select the amount of the Tokens. You can fin
 
 &nbsp;<br>
 </details>
+
+## How to register Metadata for your Native Tokens in Offline-Mode
+
+It is totally the same procedure like doing it in Online-Mode. Please check out the example **[here](#how-to-register-metadata-for-your-native-tokens)**.
+
+&nbsp;<br>
 
 # Conclusion
 
